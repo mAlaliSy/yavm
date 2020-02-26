@@ -6,6 +6,7 @@
 
 // Operation code 
 typedef enum {
+	OP_CONSTANT,
 	OP_RETURN,
 
 } Opcode;
