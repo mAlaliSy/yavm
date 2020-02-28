@@ -1,4 +1,5 @@
 #ifndef memory_h
+#define memory_h
 
 #define GROW_CAPACITY(capacity) \
 		((capacity < 8)?8:2*capacity)
@@ -8,6 +9,8 @@
 
 #define FREE_ARRAY(type, pointer, oldCount)\
 	reallocate(pointer, sizeof(type) * oldCount, 0)
+
+
 
 void* reallocate(void* previous, size_t oldSize, size_t newSize);
 

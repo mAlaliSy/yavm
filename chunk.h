@@ -19,6 +19,8 @@ typedef struct {
 	int capacity;
 	// bytes of code
 	uint8_t* code;
+	// line number for each byte code instruction
+	int* lines;
 
 	ValueArray constants;
 
@@ -26,7 +28,7 @@ typedef struct {
 
 void initChunk(Chunk* chunk);
 void freeChunk(Chunk* chun);
-void writeChunk(Chunk* chunk, uint8_t byte);
+void writeChunk(Chunk* chunk, uint8_t byte, int line);
 int addConstant(Chunk* chunk, Value value);
 
 
