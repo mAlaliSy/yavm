@@ -23,6 +23,7 @@ void writeChunk(Chunk* chunk, uint8_t byte, int line) {
 		chunk->capacity = GROW_CAPACITY(oldCapacity);
 		// when chunk->code is NULL (after initChuk is called), realloc is called and it behaves like malloc
 		chunk->code = GROW_ARRAY(chunk->code, uint8_t, oldCapacity, chunk->capacity);
+		chunk->lines = GROW_ARRAY(chunk->lines, uint8_t, oldCapacity, chunk->capacity);
 	}
 	chunk->code[chunk->count] = byte;
 	chunk->lines[chunk->count] = line;

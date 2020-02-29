@@ -1,4 +1,6 @@
 #ifndef value_h
+#define value_h
+
 #include "commons.h"
 
 typedef double Value;
