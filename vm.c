@@ -2,6 +2,8 @@
 #include "commons.h"
 #include <stdio.h>
 #include "debug.h"
+#include "compiler.h"
+
 
 VM vm;
 
@@ -16,6 +18,11 @@ void initVM()
 
 void freeVM()
 {
+}
+InterpretResult interpret(const char* source)
+{
+    compile(source);
+    return INTERPRET_OK;
 }
 static InterpretResult run() {
 #define READ_BYTE() (*vm.pc++)
@@ -64,13 +71,6 @@ static InterpretResult run() {
 #undef READ_BYTE                        
 }
 
-InterpretResult interpretChunk(Chunk* chunk)
-{
-	vm.chunk = chunk;
-	// Point to the first instruction in the chunk
-	vm.pc = vm.chunk->code;
-	return run();
-}
 
 void push(Value value)
 {
