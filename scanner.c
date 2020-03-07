@@ -1,6 +1,6 @@
 #include "scanner.h"
 
-#include <stdio.h>    
+#include <stdio.h>
 #include <string.h>   
 
 #include "commons.h"   
@@ -11,7 +11,6 @@ typedef struct {
     const char* current;
     int line;
 } Scanner;
-
 
 Scanner scanner;
 
