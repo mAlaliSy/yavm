@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "compiler.h"
 
+static InterpretResult run();
 
 VM vm;
 
@@ -46,10 +47,10 @@ static InterpretResult run() {
         double b = pop(); \
         double a = pop(); \
         push(a op b); \
-    } while (false)      
+    } while (false)
 
     while(1) {
-        #ifdef DEBUG_TRACE_EXECUTION                                        
+        #ifdef DEBUG_TRACE_EXECUTION
         printf("          ");
         for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
             printf("[ ");
@@ -58,7 +59,7 @@ static InterpretResult run() {
         }
         printf("\n");
         disassembleInstruction(vm.chunk, (int)(vm.pc - vm.chunk->code));
-        #endif 
+        #endif
         uint8_t instruction;
         switch (instruction = READ_BYTE()) {
             case OP_CONSTANT: {
@@ -66,7 +67,7 @@ static InterpretResult run() {
                 push(constant);
                 break;
             }
-            case OP_NEGATE: 
+            case OP_NEGATE:
                 push(-pop());
                 break;
             case OP_ADD:      BINARY_OP(+); break;
@@ -80,9 +81,9 @@ static InterpretResult run() {
             }
         }
     }
-#undef BINARY_OP    
+#undef BINARY_OP
 #undef READ_CONSTANT
-#undef READ_BYTE                        
+#undef READ_BYTE
 }
 
 

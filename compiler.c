@@ -55,6 +55,8 @@ static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 
 
+static void emitReturn();
+
 static void errorAt(Token* token, const char* message) {
     if (parser.panicMode) return;
 
@@ -119,6 +121,10 @@ static void endCompiler() {
         }
     #endif 
     emitReturn();
+}
+
+static void emitReturn() {
+    emitByte(OP_RETURN);
 }
 
 static void binary() {
@@ -255,6 +261,7 @@ bool compile(const char* source, Chunk* chunk) {
     advance();
     expression();
     consume(TOKEN_EOF, "Expect end of expression.");
-    
+
+    endCompiler();
     return !parser.hadError;
 }

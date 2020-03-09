@@ -1,5 +1,6 @@
 #include "value.h"
 #include "memory.h"
+#include "commons.h"
 
 void initValueArray(ValueArray* array) {
     array->values = NULL;
