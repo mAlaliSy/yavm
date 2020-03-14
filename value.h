@@ -39,4 +39,6 @@ void writeValueArray(ValueArray* array, Value value);
 void freeValueArray(ValueArray* array);
 void printValue(Value value);
 
+bool valuesEqual(Value a, Value b);
+
 #endif // !value_h
