@@ -155,7 +155,7 @@ static void runtimeError(const char *format, ...) {
     va_end(args);
     fputs("\n", stderr);
 
-    size_t instruction = vm.ip - vm.chunk->code;
+    size_t instruction = vm.pc - vm.chunk->code;
     int line = vm.chunk->lines[instruction];
     fprintf(stderr, "[line %d] in script\n", line);
 
