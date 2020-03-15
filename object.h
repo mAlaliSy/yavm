@@ -35,4 +35,7 @@ static inline bool isObjType(Value value, ObjType type) {
     return IS_OBJ(value) && AS_OBJ(value)->type == type;
 }
 
+ObjString* copyString(const char* chars, int length);
+
+
 #endif //YAVM_OBJECT_H

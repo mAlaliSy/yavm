@@ -21,4 +21,4 @@ add_executable(YAVM
         value.c
         value.h
         vm.c
-        vm.h object.h)
+        vm.h object.h object.c)

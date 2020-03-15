@@ -4,6 +4,7 @@
 #include "scanner.h"
 #include "chunk.h"
 #include <stdlib.h>
+#include "object.h"
 
 #ifdef DEBUG_PRINT_CODE
 
@@ -210,6 +211,11 @@ static void number() {
     emitConstant(NUMBER_VAL(value));
 }
 
+static void string() {
+    emitConstant(OBJ_VAL(copyString(parser.previous.start + 1,
+                                    parser.previous.length - 2)));
+}
+
 static void expression() {
     parsePrecedence(PREC_ASSIGNMENT);
 }
@@ -259,7 +265,7 @@ ParseRule rules[] = {
         {NULL,  binary,  PREC_COMPARISON}, // TOKEN_LESS
         {NULL,  binary,  PREC_COMPARISON}, // TOKEN_LESS_EQUAL
         {NULL,     NULL, PREC_NONE},       // TOKEN_IDENTIFIER
-        {NULL,     NULL, PREC_NONE},       // TOKEN_STRING
+        { string,   NULL,    PREC_NONE },       // TOKEN_STRING
         {number,   NULL, PREC_NONE},       // TOKEN_NUMBER
         {NULL,     NULL, PREC_NONE},       // TOKEN_AND
         {NULL,     NULL, PREC_NONE},       // TOKEN_CLASS
