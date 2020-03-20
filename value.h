@@ -18,7 +18,7 @@ typedef struct {
     union {
         bool boolean;
         double number;
-        Obj* obj;
+        Obj *obj;
     } as;
 } Value;
 
@@ -42,14 +42,19 @@ typedef struct {
 typedef struct {
     int capacity;
     int count;
-    Value* values;
+    Value *values;
 } ValueArray;
 
-void initValueArray(ValueArray* array);
-void writeValueArray(ValueArray* array, Value value);
-void freeValueArray(ValueArray* array);
+void initValueArray(ValueArray *array);
+
+void writeValueArray(ValueArray *array, Value value);
+
+void freeValueArray(ValueArray *array);
+
 void printValue(Value value);
 
 bool valuesEqual(Value a, Value b);
+
+void printObject(Value value);
 
 #endif // !value_h
