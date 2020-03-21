@@ -1,5 +1,6 @@
 #include "chunk.h"
 #include "value.h"
+#include "table.h"
 
 #ifndef VM_H
 #define VM_H
@@ -13,6 +14,8 @@ typedef struct {
     Value* stackTop;
 
     Obj* objects;
+
+    Table strings;
 } VM;
 
 typedef enum {
