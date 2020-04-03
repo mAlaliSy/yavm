@@ -69,5 +69,7 @@ int disassembleInstruction(Chunk *chunk, int offset) {
         default:
             printf("Unknown opcode %d\n", instruction);
             return offset + 1;
+        case OP_POP:
+            return simpleInstruction("OP_POP", offset);
     }
 }

@@ -163,6 +163,8 @@ static InterpretResult run() {
                 printf("\n");
                 break;
             }
+            case OP_POP: pop(); break;
+
         }
     }
 #undef BINARY_OP
