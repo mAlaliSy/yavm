@@ -8,6 +8,8 @@
 #include <stdarg.h>
 #include <string.h>
 
+
+
 static InterpretResult run();
 
 static void runtimeError(const char *format, ...);
@@ -42,11 +44,13 @@ void initVM() {
     resetStack();
     vm.objects = NULL;
     initTable(&vm.strings);
+    initTable(&vm.globals);
 }
 
 void freeVM() {
     freeObjects();
     freeTable(&vm.strings);
+    freeTable(&vm.globals);
 }
 
 InterpretResult interpret(const char *source) {
@@ -81,6 +85,7 @@ static InterpretResult run() {
       double a = AS_NUMBER(pop()); \
       push(valueType(a op b)); \
     } while (false)
+#define READ_STRING() AS_STRING(READ_CONSTANT())
 
     while (1) {
 #ifdef DEBUG_TRACE_EXECUTION
@@ -165,10 +170,27 @@ static InterpretResult run() {
             }
             case OP_POP: pop(); break;
 
+            case OP_DEFINE_GLOBAL: {
+                ObjString* name = READ_STRING();
+                tableSet(&vm.globals, name, peek(0));
+                pop();
+                break;
+            }
+
+            case OP_GET_GLOBAL: {
+                ObjString* name = READ_STRING();
+                Value value;
+                if (!tableGet(&vm.globals, name, &value)) {
+                    runtimeError("Undefined variable '%s'.", name->chars);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                push(value);
+                break;
         }
     }
 #undef BINARY_OP
 #undef READ_CONSTANT
+#undef READ_STRING
 #undef READ_BYTE
 }
 
