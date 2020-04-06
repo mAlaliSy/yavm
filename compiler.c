@@ -34,7 +34,7 @@ typedef enum {
     PREC_PRIMARY
 } Precedence;
 
-typedef void (*ParseFn)(bool canAssign);
+typedef void (*ParseFn)(bool canAssign);  // function pointer with prototype: void ParseFn(bool canAssign)
 
 
 typedef struct {
@@ -43,9 +43,20 @@ typedef struct {
     Precedence precedence;
 } ParseRule;
 
+typedef struct {
+    Token name;
+    int depth;
+} Local;
+
+typedef struct Compiler {
+    Local locals[UINT8_COUNT];
+    int localCount;
+    int scopeDepth;
+} Compiler;
+
 Parser parser;
 
-
+Compiler* current = NULL;
 Chunk *compilingChunk;
 
 static Chunk *currentChunk() {
@@ -222,6 +233,12 @@ static void emitConstant(Value value) {
     emitBytes(OP_CONSTANT, makeConstant(value));
 }
 
+static void initCompiler(Compiler* compiler) {
+    compiler->localCount = 0;
+    compiler->scopeDepth = 0;
+    current = compiler;
+}
+
 static void number(bool canAssign) {
     double value = strtod(parser.previous.start, NULL);
     emitConstant(NUMBER_VAL(value));
@@ -351,10 +368,27 @@ static void expressionStatement() {
     emitByte(OP_POP);
 }
 
+static void block() {
+    while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
+        declaration();
+    }
+
+    consume(TOKEN_RIGHT_BRACE, "Expect '}' after block.");
+}
+static void beginScope() {
+    current->scopeDepth++;
+}
+static void endScope() {
+    current->scopeDepth--;
+}
 static void statement() {
     if (match(TOKEN_PRINT)) {
         printStatement();
-    }else{
+    }else if (match(TOKEN_LEFT_BRACE)) {
+        beginScope();
+        block();
+        endScope();
+    } else {
         expressionStatement();
     }
 }
@@ -424,6 +458,8 @@ uint8_t identifierConstant(Token *name) {
 
 bool compile(const char *source, Chunk *chunk) {
     initScanner(source);
+    Compiler compiler;
+    initCompiler(&compiler);
     compilingChunk = chunk;
 
     parser.hadError = false;

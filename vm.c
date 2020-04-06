@@ -189,7 +189,7 @@ static InterpretResult run() {
                 break;
             }
             case OP_SET_GLOBAL: { // assignment is an expression, so it needs to leave that value there
-                                  // in case the assignment is nested inside some larger expression
+                // in case the assignment is nested inside some larger expression
                 ObjString *name = READ_STRING();
                 if (tableSet(&vm.globals, name, peek(0))) {
                     tableDelete(&vm.globals, name);
@@ -204,34 +204,36 @@ static InterpretResult run() {
 #undef READ_STRING
 #undef READ_BYTE
     }
-
-    static void concatenate() {
-        ObjString *b = AS_STRING(pop());
-        ObjString *a = AS_STRING(pop());
-
-        int length = a->length + b->length;
-        char *chars = ALLOCATE(char, length + 1);
-        memcpy(chars, a->chars, a->length);
-        memcpy(chars + a->length, b->chars, b->length);
-        chars[length] = '\0';
-
-        ObjString *result = takeString(chars, length);
-        push(OBJ_VAL(result));
-    }
-
-    struct sObj;
+}
 
 
-    static void runtimeError(const char *format, ...) {
-        va_list args;
-        va_start(args, format);
-        vfprintf(stderr, format, args);
-        va_end(args);
-        fputs("\n", stderr);
+static void concatenate() {
+    ObjString *b = AS_STRING(pop());
+    ObjString *a = AS_STRING(pop());
 
-        size_t instruction = vm.pc - vm.chunk->code;
-        int line = vm.chunk->lines[instruction];
-        fprintf(stderr, "[line %d] in script\n", line);
+    int length = a->length + b->length;
+    char *chars = ALLOCATE(char, length + 1);
+    memcpy(chars, a->chars, a->length);
+    memcpy(chars + a->length, b->chars, b->length);
+    chars[length] = '\0';
 
-        resetStack();
-    }
+    ObjString *result = takeString(chars, length);
+    push(OBJ_VAL(result));
+}
+
+struct sObj;
+
+
+static void runtimeError(const char *format, ...) {
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fputs("\n", stderr);
+
+    size_t instruction = vm.pc - vm.chunk->code;
+    int line = vm.chunk->lines[instruction];
+    fprintf(stderr, "[line %d] in script\n", line);
+
+    resetStack();
+}
