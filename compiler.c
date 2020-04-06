@@ -5,6 +5,7 @@
 #include "chunk.h"
 #include <stdlib.h>
 #include "object.h"
+#include <string.h>
 
 #ifdef DEBUG_PRINT_CODE
 
@@ -380,6 +381,13 @@ static void beginScope() {
 }
 static void endScope() {
     current->scopeDepth--;
+
+    while (current->localCount > 0 &&
+           current->locals[current->localCount - 1].depth >
+           current->scopeDepth) {
+        emitByte(OP_POP);
+        current->localCount--;
+    }
 }
 static void statement() {
     if (match(TOKEN_PRINT)) {
@@ -419,10 +427,50 @@ static void synchronize() {
     }
 }
 static void defineVariable(uint8_t global) {
+    if (current->scopeDepth > 0) { // local variable
+        return;
+    }
     emitBytes(OP_DEFINE_GLOBAL, global);
 }
+static void addLocal(Token name) {
+    if (current->localCount == UINT8_COUNT) {
+        error("Too many local variables in function.");
+        return;
+    }
+    Local* local = &current->locals[current->localCount++];
+    local->name = name;
+    local->depth = current->scopeDepth;
+}
+
+static bool identifiersEqual(Token* a, Token* b) {
+    if (a->length != b->length) return false;
+    return memcmp(a->start, b->start, a->length) == 0;
+}
+
+// Declares local variables
+static void declareVariable() {
+    // Global variables are implicitly declared.
+    if (current->scopeDepth == 0) return;
+    for (int i = current->localCount - 1; i >= 0; i--) {
+        Local* local = &current->locals[i];
+        if (local->depth != -1 && local->depth < current->scopeDepth) {
+            break;
+        }
+
+        if (identifiersEqual(name, &local->name)) {
+            error("Variable with this name already declared in this scope.");
+        }
+    }
+    Token* name = &parser.previous;
+    addLocal(*name);
+}
+
+// parses the variable name, add it to the constant pool, and return its id in the constant array chunk->constants
 static uint8_t parseVariable(const char* errorMessage) {
     consume(TOKEN_IDENTIFIER, errorMessage);
+
+    declareVariable();
+    if (current->scopeDepth > 0) return 0; // local variable
     return identifierConstant(&parser.previous);
 }
 
