@@ -217,6 +217,12 @@ static InterpretResult run() {
                 break;
             }
 
+            case OP_JUMP: {
+                uint16_t offset = READ_SHORT();
+                vm.pc += offset;
+                break;
+            }
+
 
         }
 #undef BINARY_OP
