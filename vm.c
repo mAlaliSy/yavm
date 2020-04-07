@@ -74,6 +74,8 @@ InterpretResult interpret(const char *source) {
 static InterpretResult run() {
 #define READ_BYTE() (*vm.pc++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
+#define READ_SHORT() \
+    (vm.ip += 2, (uint16_t)((vm.ip[-2] << 8) | vm.ip[-1]))
 #define BINARY_OP(valueType, op) \
     do { \
       if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) { \
@@ -209,12 +211,19 @@ static InterpretResult run() {
                 vm.stack[slot] = peek(0);
                 break;
             }
+            case OP_JUMP_IF_FALSE: {
+                uint16_t offset = READ_SHORT();
+                if (isFalsey(peek(0))) vm.pc += offset;
+                break;
+            }
+
 
         }
 #undef BINARY_OP
 #undef READ_CONSTANT
 #undef READ_STRING
 #undef READ_BYTE
+#undef READ_SHORT
     }
 }
 
