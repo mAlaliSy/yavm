@@ -1,1 +1,1 @@
-# yavm
+# Yet another virtual machine (YAVM)
